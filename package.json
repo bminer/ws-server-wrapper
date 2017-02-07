@@ -1,0 +1,34 @@
+{
+	"name": "ws-server-wrapper",
+	"version": "1.0.0",
+	"description": "Lightweight WebSocketServer wrapper lib using ws-wrapper to wrap connected WebSockets",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bminer/ws-server-wrapper.git"
+	},
+	"keywords": [
+		"ws-wrapper",
+		"websocket",
+		"ws",
+		"event",
+		"handling",
+		"channels",
+		"request",
+		"namespace",
+		"server"
+	],
+	"dependencies": {
+		"ws-wrapper": ">=1.1 <2"
+	},
+	"engine": {"node": ">=4"},
+	"author": "Blake C. Miner",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/bminer/ws-server-wrapper/issues"
+	},
+	"homepage": "https://github.com/bminer/ws-server-wrapper#readme"
+}

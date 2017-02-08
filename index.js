@@ -16,7 +16,7 @@ class WebSocketServerChannel {
 	addSocket(socket) {
 		// Bind newly connected socket to all registered event handlers
 		this._emitter.eventNames().forEach((eventName) => {
-			if(eventName !== "connection" && eventName !== "disconnect") {
+			if(this.name != null || !WebSocketServerChannel.NO_WRAP.has(eventName) ) {
 				this._emitter.listeners(eventName).forEach((listener) => {
 					if(this.name != null) {
 						socket.of(this.name).on(eventName, listener);
@@ -26,6 +26,14 @@ class WebSocketServerChannel {
 				});
 			}
 		});
+	}
+
+	eventNames() {
+		return this._emitter.eventNames();
+	}
+
+	listeners(eventName) {
+		return this._emitter.listeners(eventName);
 	}
 }
 
@@ -43,7 +51,7 @@ class WebSocketServerChannel {
 		this._emitter[method].apply(this._emitter, arguments);
 		/* Then pass event handling to all connected sockets (except for a
 			few events) */
-		if(eventName !== "connection" && eventName !== "disconnect") {
+		if(this.name != null || !WebSocketServerChannel.NO_WRAP.has(eventName) ) {
 			this._wrapper.sockets.forEach((socket) => {
 				if(this.name != null)
 					socket.of(name)[method].apply(socket, arguments);
@@ -54,6 +62,8 @@ class WebSocketServerChannel {
 		return this;
 	};
 });
+
+WebSocketServerChannel.NO_WRAP = new Set(["connection", "disconnect", "error"]);
 
 /* Define a WebSocketServerWrapper, which (in a weird way) is also a
 	WebSocketServerChannel. */
@@ -80,6 +90,8 @@ class WebSocketServerWrapper extends WebSocketServerChannel {
 			this.sockets.add(socket);
 			socket.on("disconnect", () => {
 				this.sockets.delete(socket);
+				// Abort send queue and pending requests
+				socket.abort();
 				// Emit disconnect event
 				this.emit("disconnect", socket);
 			});
@@ -90,6 +102,10 @@ class WebSocketServerWrapper extends WebSocketServerChannel {
 			}
 			// Emit connection event
 			this.emit("connection", socket);
+		});
+		// Emit errors
+		this.server.on("error", (err) => {
+			this.emit("error", err);
 		});
 	}
 

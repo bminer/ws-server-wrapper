@@ -1,8 +1,8 @@
 {
 	"name": "ws-server-wrapper",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Lightweight WebSocketServer wrapper lib using ws-wrapper to wrap connected WebSockets",
-	"main": "index.js",
+	"main": "./lib/wrapper.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},

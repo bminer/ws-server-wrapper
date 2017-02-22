@@ -47,7 +47,8 @@ Constructs a new WebSocketServerWrapper, and binds it to the native
 WebSocketServer instance.
 
 - `webSocketServerInstance` - the native WebSocketServer instance
-- `options` - No options yet!
+- `options`
+	- `debug` - set to `true` to print debugging messages to `console.log`
 
 Events
 

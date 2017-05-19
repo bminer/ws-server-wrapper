@@ -47,8 +47,9 @@ Constructs a new WebSocketServerWrapper, and binds it to the native
 WebSocketServer instance.
 
 - `webSocketServerInstance` - the native WebSocketServer instance
-- `options`
-	- `debug` - set to `true` to print debugging messages to `console.log`
+- `options` - options passed to each WebSocketWrapper constructor when a
+	WebSocket connects.  See [the ws-wrapper API](https://github.com/bminer/ws-wrapper/#api)
+	for details.
 
 Events
 
@@ -61,20 +62,23 @@ Events
 
 The EventEmitter-like API looks like this:
 
+See the [ws-wrapper API documentation](https://github.com/bminer/ws-wrapper/#api)
+for more details.
+
 - `server.on(eventName, listener)`
 	Adds the `listener` function to the end of the listeners array for the
 	event named `eventName` for all connected sockets, now and in the future.
-  When an event or request matching the `eventName` is received by any
-  connected WebSocket, the `listener` is called.
+	When an event or request matching the `eventName` is received by any
+	connected WebSocket, the `listener` is called.
 
 	Values returned by the `listener` callback are used to respond to
-	requests.  If the inbound message is a simple event (not a request), the
-	return value of the `listener` is ignored.
+	requests.  If the return value of the `listener` is a `Promise`, the
+	response to the request will be sent once the Promise is resolved or
+	rejected; otherwise, the return value of the `listener` is sent back to
+	the remote end immediately.
 
-	If the return value of the `listener` is a `Promise`, the response to
-	the request will be sent once the Promise is resolved or rejected;
-	otherwise, the return value of the `listener` is sent back to the remote
-	end immediately.
+	If the inbound message is a simple event (not a request), the return
+	value of the `listener` is ignored.
 - `server.removeListener(eventName, listener)`
 	Removes the specified `listener` from the listener array for the event
 	named `eventName`.

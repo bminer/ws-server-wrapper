@@ -1,6 +1,6 @@
 {
 	"name": "ws-server-wrapper",
-	"version": "1.2.0",
+	"version": "1.3.0",
 	"description": "Lightweight WebSocketServer wrapper lib using ws-wrapper to wrap connected WebSockets",
 	"main": "./lib/wrapper.js",
 	"scripts": {
@@ -22,7 +22,7 @@
 		"server"
 	],
 	"dependencies": {
-		"ws-wrapper": ">=1.1 <2"
+		"ws-wrapper": ">=1.3 <2"
 	},
 	"engine": {"node": ">=4"},
 	"author": "Blake C. Miner",

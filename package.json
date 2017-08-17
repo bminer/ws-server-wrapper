@@ -1,6 +1,6 @@
 {
 	"name": "ws-server-wrapper",
-	"version": "1.3.1",
+	"version": "1.3.2",
 	"description": "Lightweight WebSocketServer wrapper lib using ws-wrapper to wrap connected WebSockets",
 	"main": "./lib/wrapper.js",
 	"scripts": {

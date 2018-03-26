@@ -1,7 +1,8 @@
 # ws-server-wrapper
 
 Lightweight WebSocketServer wrapper lib using [ws-wrapper](https://github.com/bminer/ws-wrapper)
-to wrap connected WebSockets.  The only dependency is ws-wrapper itself.
+and [ws](https://github.com/websockets/ws) to wrap connected WebSockets.  The
+only dependency is ws-wrapper itself.
 
 ## Install
 
@@ -17,7 +18,7 @@ documentation below for more details.
 Quick Server-side Example:
 
 Use [ws-server-wrapper](https://github.com/bminer/ws-server-wrapper) to wrap
-the WebSocketServer:
+the [WebSocket.Server](https://github.com/websockets/ws/blob/master/doc/ws.md#class-websocketserver):
 
 ```javascript
 const WebSocketServer = require("ws").Server
@@ -38,13 +39,14 @@ serverWrapper.of("pointless").on("ping", function() {
 
 Class: WebSocketServerWrapper
 
-A WebSocketServerWrapper simply wraps around a WebSocketServer to give you
-well-deserved functionality. :)
+A WebSocketServerWrapper simply wraps around a
+[WebSocket.Server](https://github.com/websockets/ws/blob/master/doc/ws.md#class-websocketserver)
+to give you well-deserved functionality. :)
 
 `server = new WebSocketServerWrapper(webSocketServerInstance[, options]);`
 
 Constructs a new WebSocketServerWrapper, and binds it to the native
-WebSocketServer instance.
+WebSocketServer instance from [ws](https://github.com/websockets/ws).
 
 - `webSocketServerInstance` - the native WebSocketServer instance
 - `options` - options passed to each WebSocketWrapper constructor when a
@@ -55,6 +57,8 @@ Events
 
 - Event: "connection" - Emitted when a WebSocket connects to the WebSocketServer
 	- `socket` - A WebSocketWrapper instance, wrapping a native WebSocket
+	- `request` - A [http.IncomingMessage](https://nodejs.org/api/http.html#http_class_http_incomingmessage)
+		instance.
 - Event: "disconnect" - Emitted when a WebSocket disconnects from the WebSocketServer
 	- `socket` - A WebSocketWrapper instance, wrapping a native WebSocket
 - Event: "error" - Emitted when an error occurs on the WebSocketServer

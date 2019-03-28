@@ -52,6 +52,13 @@ WebSocketServer instance from [ws](https://github.com/websockets/ws).
 - `options` - options passed to each WebSocketWrapper constructor when a
 	WebSocket connects.  See [the ws-wrapper API](https://github.com/bminer/ws-wrapper/#api)
 	for details.
+	- `requestTimeout` - See [the ws-wrapper API](https://github.com/bminer/ws-wrapper/#api)
+	API for more info. Defaults to 2 minutes if not specified.
+	- `heartbeatInterval` - If set, a "ping" will be sent to all connected
+	sockets every `heartbeatInterval` milliseconds.  If a "pong" response
+	is not received by the start of the next ping, the connection will be
+	terminated. Defaults to 1 minute if not specified.  Set to a falsy value
+	to disable heartbeats.
 
 Events
 
@@ -112,3 +119,11 @@ Other methods and properties:
   of connected WebSocketWrappers.
 - `server.close()`
 	Closes the native WebSocketServer
+
+## Detecting Broken Connections
+
+The WebSocketServerWrapper will automatically (by default) ping all open sockets
+on a regular basis. If there is no "pong" response by the start of the next ping,
+the connection will be assumed to be "broken" and will be terminated automatically.   
+See `options.heartbeatInterval` for more information.  Also see the approached
+outlined [here](https://github.com/websockets/ws#how-to-detect-and-close-broken-connections).

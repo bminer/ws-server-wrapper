@@ -121,14 +121,6 @@ function httpResHandler(req, res) {
 		// it needs ran through modConcat
 		concatAndCache(__dirname, req, res);
 
-		/*
-		const src = new modConcat.ModuleConcatStream(__dirname + "/client.js", {
-			"browser": true
-		});
-		res.setHeader("Content-Type", "text/javascript");
-		src.pipe(res);
-		*/
-		
 	} else {
 		res.statusCode = 404;
 		res.end("Not Found");

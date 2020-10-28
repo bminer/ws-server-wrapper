@@ -64,35 +64,30 @@ socketServer.of("chat").on("login", function(username) {
 	userLogout(username);
 });
 
-// serves up a browser-compatible version of req.URL (which should correspond to a .JS file) by // using modConCat. Cache output, and only regenerate whenever original .JS file changes
+// serves up a browser-compatible version of req.URL (which should correspond to a .JS file) by 
+// using modConCat. Cache output, and only regenerate whenever original .JS file changes
 function concatAndCache(baselocation, req, res) {
 
-	var inputFile	= baselocation + req.url;
+	var inputFile = baselocation + req.url;
 	var outputFile 	= inputFile + ".modConcat";
 		
 	// compare dates on input vs. output files
 	// if input file is newer, we need to regenerate output file
 	// otherwise, just serve up output file
 	
-	fs.stat(inputFile,  (err, stat_input) => {
-		fs.stat(outputFile, (err, stat_output) => {
-
-			var NeedsRegenerated;
-		
+	fs.stat(inputFile,  (errIn, statInput) => {
+		fs.stat(outputFile, (errOut, statOutput) => {
 			// input file doesn't exist?? nothing we can do
-			if (stat_input === undefined) return;	
+			if (statInput == null) return;	
+
+			if (errIn) return;
+
+			// if errOut is truthy, the output file doesn't exist
+			// otherwise, we just need to regen if the input file was modified 
+			const needsRegenerated = errOut || statInput.mtime > statOutput.mtime
 			
-			// output file doesn't exist?? then we definitely need to regenerate it
-			if (stat_output === undefined) 
-				NeedsRegenerated = true;
-			else 
-				// both input and output files exit
-				// only regenerate if input has been modified more recently
-				// than the cached version
-				NeedsRegenerated = (stat_input.mtime > stat_output.mtime);
-			 
 			// if necessary, regenerate outputfile from inputfile
-			if (NeedsRegenerated) {			
+			if (needsRegenerated) {			
 				modConcat(inputFile, outputFile, (err, stats) => {
 					if(err) throw err;
 					console.log(stats.files.length + " were combined into " + outputFile);
@@ -100,14 +95,12 @@ function concatAndCache(baselocation, req, res) {
 					fs.createReadStream(outputFile).pipe(res);
 				});
 			} else {
-				// the file doesn't need regenerated, so just serve up the cached copy
-				console.log("using cached file...");
-				
+				// just serve up cached copy from disk
 				res.setHeader("Content-Type", "application/javascript");
 				fs.createReadStream(outputFile).pipe(res);
 			}
-		  });
 		});
+	});
 }
 
 function httpResHandler(req, res) {

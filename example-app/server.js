@@ -64,19 +64,56 @@ socketServer.of("chat").on("login", function(username) {
 	userLogout(username);
 });
 
+// serves up a browser-compatible version of req.URL (which should correspond to a .JS file) by 
+// using modConCat. Cache output, and only regenerate whenever original .JS file changes
+function concatAndCache(baselocation, req, res) {
+
+	var inputFile = baselocation + req.url;
+	var outputFile 	= inputFile + ".modConcat";
+		
+	// compare dates on input vs. output files
+	// if input file is newer, we need to regenerate output file
+	// otherwise, just serve up output file
+	
+	fs.stat(inputFile,  (errIn, statInput) => {
+		fs.stat(outputFile, (errOut, statOutput) => {
+			// input file doesn't exist?? nothing we can do
+			if (statInput == null) return;	
+
+			if (errIn) return;
+
+			// if errOut is truthy, the output file doesn't exist
+			// otherwise, we just need to regen if the input file was modified 
+			const needsRegenerated = errOut || statInput.mtime > statOutput.mtime
+			
+			// if necessary, regenerate outputfile from inputfile
+			if (needsRegenerated) {			
+				modConcat(inputFile, outputFile, (err, stats) => {
+					if(err) throw err;
+					console.log(stats.files.length + " were combined into " + outputFile);
+					res.setHeader("Content-Type", "application/javascript");
+					fs.createReadStream(outputFile).pipe(res);
+				});
+			} else {
+				// just serve up cached copy from disk
+				res.setHeader("Content-Type", "application/javascript");
+				fs.createReadStream(outputFile).pipe(res);
+			}
+		});
+	});
+}
+
 function httpResHandler(req, res) {
 	// Serve index.html and client.js
 	if(req.url === "/") {
 		res.setHeader("Content-Type", "text/html");
 		fs.createReadStream(__dirname + "/index.html").pipe(res);
 	} else if(req.url === "/client.js") {
-		// Build client.js using "node-module-concat"
-		// TODO: Make this happen only once; not for each request!
-		const src = new modConcat.ModuleConcatStream(__dirname + "/client.js", {
-			"browser": true
-		});
-		res.setHeader("Content-Type", "text/javascript");
-		src.pipe(res);
+		
+		// special logic needed for client.js because
+		// it needs ran through modConcat
+		concatAndCache(__dirname, req, res);
+
 	} else {
 		res.statusCode = 404;
 		res.end("Not Found");

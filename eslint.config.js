@@ -50,6 +50,7 @@ module.exports = [
 	{
 		files: ["example-app/client.js"],
 		languageOptions: {
+			sourceType: "module",
 			globals: {
 				...globals.browser,
 				$: false,

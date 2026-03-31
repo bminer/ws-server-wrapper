@@ -1,6 +1,4 @@
-"use strict"
-
-const WebSocketWrapper = require("ws-wrapper")
+import WebSocketWrapper from "ws-wrapper"
 
 // Create WebSocketWrapper
 const socket = new WebSocketWrapper(new WebSocket("ws://" + location.host))

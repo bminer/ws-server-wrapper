@@ -1,11 +1,9 @@
-/* This chat server uses "ws" for Node.js WebSockets.
-	"node-module-concat" is used to bundle the client-side code at run-time.
-*/
+// This chat server uses "ws" for Node.js WebSockets.
 const http = require("http"),
 	fs = require("fs"),
+	path = require("path"),
 	WebSocketServer = require("ws").Server,
-	WebSocketServerWrapper = require("../"),
-	modConcat = require("module-concat")
+	WebSocketServerWrapper = require("../")
 
 // Create new HTTP server and a new WebSocketServer
 const server = http.createServer(httpResHandler),
@@ -67,19 +65,38 @@ socketServer
 		userLogout(username)
 	})
 
+const wsWrapperDir = path.resolve(__dirname, "../node_modules/ws-wrapper")
+const eventemitter3Dir = path.resolve(
+	__dirname,
+	"../node_modules/eventemitter3"
+)
+
+function serveNodeModuleDir(dir, urlPrefix, req, res) {
+	const filePath = path.join(dir, req.url.slice(urlPrefix.length))
+	if (!filePath.startsWith(dir)) {
+		res.statusCode = 403
+		return res.end("Forbidden")
+	}
+	res.setHeader("Content-Type", "text/javascript")
+	const stream = fs.createReadStream(filePath)
+	stream.on("error", () => {
+		res.statusCode = 404
+		res.end("Not Found")
+	})
+	stream.pipe(res)
+}
+
 function httpResHandler(req, res) {
-	// Serve index.html and client.js
 	if (req.url === "/") {
 		res.setHeader("Content-Type", "text/html")
 		fs.createReadStream(__dirname + "/index.html").pipe(res)
 	} else if (req.url === "/client.js") {
-		// Build client.js using "node-module-concat"
-		// TODO: Make this happen only once; not for each request!
-		const src = new modConcat.ModuleConcatStream(__dirname + "/client.js", {
-			browser: true,
-		})
 		res.setHeader("Content-Type", "text/javascript")
-		src.pipe(res)
+		fs.createReadStream(__dirname + "/client.js").pipe(res)
+	} else if (req.url.startsWith("/ws-wrapper/")) {
+		serveNodeModuleDir(wsWrapperDir, "/ws-wrapper/", req, res)
+	} else if (req.url.startsWith("/eventemitter3/")) {
+		serveNodeModuleDir(eventemitter3Dir, "/eventemitter3/", req, res)
 	} else {
 		res.statusCode = 404
 		res.end("Not Found")
